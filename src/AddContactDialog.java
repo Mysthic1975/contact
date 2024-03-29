@@ -21,13 +21,13 @@ public class AddContactDialog extends JDialog {
         postalCodeField = new JTextField(10);
         phoneNumberField = new JTextField(15);
 
-        // Create and configure labels for input fields
-        JLabel firstNameLabel = new JLabel("First Name:");
-        JLabel lastNameLabel = new JLabel("Last Name:");
-        JLabel streetLabel = new JLabel("Street:");
-        JLabel cityLabel = new JLabel("City:");
-        JLabel postalCodeLabel = new JLabel("Postal Code:");
-        JLabel phoneNumberLabel = new JLabel("Phone Number:");
+// Create and configure labels for input fields
+        JLabel firstNameLabel = new JLabel("Vorname:");
+        JLabel lastNameLabel = new JLabel("Nachname:");
+        JLabel streetLabel = new JLabel("Straße:");
+        JLabel cityLabel = new JLabel("Stadt:");
+        JLabel postalCodeLabel = new JLabel("Postleitzahl:");
+        JLabel phoneNumberLabel = new JLabel("Telefonnummer:");
 
         // Create OK and Cancel buttons
         JButton okButton = new JButton("OK");
@@ -45,7 +45,24 @@ public class AddContactDialog extends JDialog {
 
             // Validate input
             if (firstName.isEmpty() || lastName.isEmpty()) {
-                JOptionPane.showMessageDialog(AddContactDialog.this, "Please enter a first name and last name.");
+                JOptionPane.showMessageDialog(AddContactDialog.this, "Bitte geben Sie einen Vornamen und Nachnamen ein.");
+                return;
+            }
+
+// Check if the phone number contains only digits
+            if (!phoneNumber.matches("\\d+")) {
+                JOptionPane.showMessageDialog(this, "Die Telefonnummer sollte nur Ziffern enthalten.");
+                return;
+            }
+
+// Check if the name contains only letters
+            if (!firstName.matches("[a-zA-ZäöüÄÖÜß]+") || !lastName.matches("[a-zA-ZäöüÄÖÜß]+")) {
+                JOptionPane.showMessageDialog(this, "Vorname und Nachname sollten nur Buchstaben enthalten.");
+                return;
+            }
+
+            if (!postalCode.matches("\\d+")) {
+                JOptionPane.showMessageDialog(this, "Die Postleitzahl sollte nur Ziffern enthalten.");
                 return;
             }
 

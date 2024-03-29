@@ -11,7 +11,7 @@ public class EditContactDialog extends JDialog {
     private final JTextField phoneNumberField;
 
     public EditContactDialog(JFrame parent, ContactDAO contactDAO, Contact contact) {
-        super(parent, "Edit Contact", true);
+        super(parent, "Kontakt bearbeiten", true);
 
         // Create and configure input fields
         firstNameField = new JTextField(20);
@@ -29,9 +29,17 @@ public class EditContactDialog extends JDialog {
         postalCodeField.setText(contact.getPostalCode());
         phoneNumberField.setText(contact.getPhoneNumber());
 
+        // Create and configure labels for input fields
+        JLabel firstNameLabel = new JLabel("Vorname:");
+        JLabel lastNameLabel = new JLabel("Nachname:");
+        JLabel streetLabel = new JLabel("Straße:");
+        JLabel cityLabel = new JLabel("Stadt:");
+        JLabel postalCodeLabel = new JLabel("Postleitzahl:");
+        JLabel phoneNumberLabel = new JLabel("Telefonnummer:");
+
         // Create OK and Cancel buttons
         JButton okButton = new JButton("OK");
-        JButton cancelButton = new JButton("Cancel");
+        JButton cancelButton = new JButton("Abbrechen");
 
         // Add action listeners to buttons
         okButton.addActionListener(_ -> {
@@ -45,7 +53,22 @@ public class EditContactDialog extends JDialog {
 
             // Validate input
             if (firstName.isEmpty() || lastName.isEmpty()) {
-                JOptionPane.showMessageDialog(EditContactDialog.this, "Please enter a first name and last name.");
+                JOptionPane.showMessageDialog(EditContactDialog.this, "Bitte geben Sie einen Vornamen und Nachnamen ein.");
+                return;
+            }
+
+            if (!phoneNumber.matches("\\d+")) {
+                JOptionPane.showMessageDialog(this, "Die Telefonnummer sollte nur Ziffern enthalten.");
+                return;
+            }
+
+            if (!firstName.matches("[a-zA-ZäöüÄÖÜß]+") || !lastName.matches("[a-zA-ZäöüÄÖÜß]+")) {
+                JOptionPane.showMessageDialog(this, "Vorname und Nachname sollten nur Buchstaben enthalten.");
+                return;
+            }
+
+            if (!postalCode.matches("\\d+")) {
+                JOptionPane.showMessageDialog(this, "Die Postleitzahl sollte nur Ziffern enthalten.");
                 return;
             }
 
@@ -62,7 +85,7 @@ public class EditContactDialog extends JDialog {
                 contactDAO.updateContact(contact); // Use the updated contact with the id
                 dispose(); // Close dialog after updating contact
             } catch (SQLException ex) {
-                JOptionPane.showMessageDialog(EditContactDialog.this, STR."Error updating contact: \{ex.getMessage()}");
+                JOptionPane.showMessageDialog(EditContactDialog.this, STR."Fehler beim Aktualisieren des Kontakts: \{ex.getMessage()}");
             }
         });
 
@@ -72,17 +95,17 @@ public class EditContactDialog extends JDialog {
 
         // Create panel to hold input fields and labels
         JPanel inputPanel = new JPanel(new GridLayout(6, 2));
-        inputPanel.add(new JLabel("First Name:"));
+        inputPanel.add(firstNameLabel);
         inputPanel.add(firstNameField);
-        inputPanel.add(new JLabel("Last Name:"));
+        inputPanel.add(lastNameLabel);
         inputPanel.add(lastNameField);
-        inputPanel.add(new JLabel("Street:"));
+        inputPanel.add(streetLabel);
         inputPanel.add(streetField);
-        inputPanel.add(new JLabel("City:"));
+        inputPanel.add(cityLabel);
         inputPanel.add(cityField);
-        inputPanel.add(new JLabel("Postal Code:"));
+        inputPanel.add(postalCodeLabel);
         inputPanel.add(postalCodeField);
-        inputPanel.add(new JLabel("Phone Number:"));
+        inputPanel.add(phoneNumberLabel);
         inputPanel.add(phoneNumberField);
 
         // Create panel to hold buttons

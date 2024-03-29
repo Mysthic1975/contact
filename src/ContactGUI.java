@@ -30,15 +30,22 @@ public class ContactGUI extends JFrame {
     }
 
     private void createTable() {
-        tableModel = new DefaultTableModel();
-        tableModel.addColumn("First Name");
-        tableModel.addColumn("Last Name");
-        tableModel.addColumn("Street");
-        tableModel.addColumn("City");
-        tableModel.addColumn("Postal Code");
-        tableModel.addColumn("Phone Number");
+        tableModel = new DefaultTableModel() {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                // This causes all cells to be not editable
+                return false;
+            }
+        };
+        tableModel.addColumn("Vornamen");
+        tableModel.addColumn("Nachnamen");
+        tableModel.addColumn("Straße");
+        tableModel.addColumn("Ort");
+        tableModel.addColumn("Postleitzahl");
+        tableModel.addColumn("Telefonnummer");
 
         contactTable = new JTable(tableModel);
+        contactTable.setAutoCreateRowSorter(true);
         JScrollPane scrollPane = new JScrollPane(contactTable);
         add(scrollPane, BorderLayout.CENTER);
 
@@ -81,7 +88,10 @@ public class ContactGUI extends JFrame {
         JButton editButton = new JButton("Edit Contact");
         JButton deleteButton = new JButton("Delete Contact");
 
-        addButton.addActionListener(_ -> new AddContactDialog(ContactGUI.this, contactDAO));
+        addButton.addActionListener(_ -> {
+            new AddContactDialog(ContactGUI.this, contactDAO);
+            loadContacts(); // Reload contacts after adding
+        });
 
         editButton.addActionListener(_ -> {
             int selectedRow = contactTable.getSelectedRow();
@@ -113,8 +123,18 @@ public class ContactGUI extends JFrame {
                 try {
                     Contact selectedContact = contactDAO.getContact(firstName, lastName);
                     if (selectedContact != null) {
-                        contactDAO.deleteContact(selectedContact);
-                        tableModel.removeRow(selectedRow);
+                        // Show confirmation dialog before deleting
+                        int response = JOptionPane.showConfirmDialog(
+                                ContactGUI.this,
+                                STR."Möchten Sie \{firstName} \{lastName} wirklich löschen?",
+                                "Bestätigen",
+                                JOptionPane.YES_NO_OPTION,
+                                JOptionPane.QUESTION_MESSAGE
+                        );
+                        if (response == JOptionPane.YES_OPTION) {
+                            contactDAO.deleteContact(selectedContact);
+                            tableModel.removeRow(selectedRow);
+                        }
                     } else {
                         JOptionPane.showMessageDialog(ContactGUI.this, "Error: Selected contact not found.");
                     }
