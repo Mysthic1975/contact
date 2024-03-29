@@ -2,7 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.sql.SQLException;
 
-public class AddContactDialog extends JDialog {
+public class EditContactDialog extends JDialog {
     private final JTextField firstNameField;
     private final JTextField lastNameField;
     private final JTextField streetField;
@@ -10,8 +10,8 @@ public class AddContactDialog extends JDialog {
     private final JTextField postalCodeField;
     private final JTextField phoneNumberField;
 
-    public AddContactDialog(JFrame parent, ContactDAO contactDAO) {
-        super(parent, "Add Contact", true);
+    public EditContactDialog(JFrame parent, ContactDAO contactDAO, Contact contact) {
+        super(parent, "Edit Contact", true);
 
         // Create and configure input fields
         firstNameField = new JTextField(20);
@@ -21,13 +21,13 @@ public class AddContactDialog extends JDialog {
         postalCodeField = new JTextField(10);
         phoneNumberField = new JTextField(15);
 
-        // Create and configure labels for input fields
-        JLabel firstNameLabel = new JLabel("First Name:");
-        JLabel lastNameLabel = new JLabel("Last Name:");
-        JLabel streetLabel = new JLabel("Street:");
-        JLabel cityLabel = new JLabel("City:");
-        JLabel postalCodeLabel = new JLabel("Postal Code:");
-        JLabel phoneNumberLabel = new JLabel("Phone Number:");
+        // Load contact data into fields
+        firstNameField.setText(contact.getFirstName());
+        lastNameField.setText(contact.getLastName());
+        streetField.setText(contact.getStreet());
+        cityField.setText(contact.getCity());
+        postalCodeField.setText(contact.getPostalCode());
+        phoneNumberField.setText(contact.getPhoneNumber());
 
         // Create OK and Cancel buttons
         JButton okButton = new JButton("OK");
@@ -45,39 +45,44 @@ public class AddContactDialog extends JDialog {
 
             // Validate input
             if (firstName.isEmpty() || lastName.isEmpty()) {
-                JOptionPane.showMessageDialog(AddContactDialog.this, "Please enter a first name and last name.");
+                JOptionPane.showMessageDialog(EditContactDialog.this, "Please enter a first name and last name.");
                 return;
             }
 
-            // Create new contact
-            Contact newContact = new Contact(firstName, lastName, street, city, postalCode, phoneNumber);
+            // Update contact
+            contact.setFirstName(firstName);
+            contact.setLastName(lastName);
+            contact.setStreet(street);
+            contact.setCity(city);
+            contact.setPostalCode(postalCode);
+            contact.setPhoneNumber(phoneNumber);
 
-            // Add contact to database
+            // Update contact in database
             try {
-                contactDAO.addContact(newContact);
-                dispose(); // Close dialog after adding contact
+                contactDAO.updateContact(contact); // Use the updated contact with the id
+                dispose(); // Close dialog after updating contact
             } catch (SQLException ex) {
-                JOptionPane.showMessageDialog(AddContactDialog.this, STR."Error adding contact: \{ex.getMessage()}");
+                JOptionPane.showMessageDialog(EditContactDialog.this, STR."Error updating contact: \{ex.getMessage()}");
             }
         });
 
         cancelButton.addActionListener(_ -> {
-            dispose(); // Close dialog without adding contact
+            dispose(); // Close dialog without updating contact
         });
 
         // Create panel to hold input fields and labels
         JPanel inputPanel = new JPanel(new GridLayout(6, 2));
-        inputPanel.add(firstNameLabel);
+        inputPanel.add(new JLabel("First Name:"));
         inputPanel.add(firstNameField);
-        inputPanel.add(lastNameLabel);
+        inputPanel.add(new JLabel("Last Name:"));
         inputPanel.add(lastNameField);
-        inputPanel.add(streetLabel);
+        inputPanel.add(new JLabel("Street:"));
         inputPanel.add(streetField);
-        inputPanel.add(cityLabel);
+        inputPanel.add(new JLabel("City:"));
         inputPanel.add(cityField);
-        inputPanel.add(postalCodeLabel);
+        inputPanel.add(new JLabel("Postal Code:"));
         inputPanel.add(postalCodeField);
-        inputPanel.add(phoneNumberLabel);
+        inputPanel.add(new JLabel("Phone Number:"));
         inputPanel.add(phoneNumberField);
 
         // Create panel to hold buttons
@@ -96,4 +101,3 @@ public class AddContactDialog extends JDialog {
         setVisible(true);
     }
 }
-

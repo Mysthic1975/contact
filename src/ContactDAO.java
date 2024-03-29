@@ -1,6 +1,6 @@
 import java.sql.SQLException;
 
-interface ContactDAO {
+public interface ContactDAO {
     void addContact(Contact contact) throws SQLException;
     void updateContact(Contact contact) throws SQLException;
     void deleteContact(Contact contact) throws SQLException;

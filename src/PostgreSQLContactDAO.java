@@ -39,15 +39,20 @@ class PostgreSQLContactDAO implements ContactDAO {
 
     @Override
     public void updateContact(Contact contact) throws SQLException {
-        String query = "UPDATE contacts SET street=?, city=?, postal_code=?, phone_number=? WHERE first_name=? AND last_name=?";
+        String query = "UPDATE contacts SET first_name=?, last_name=?, street=?, city=?, postal_code=?, phone_number=? WHERE id=?";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setString(1, contact.street);
-            statement.setString(2, contact.city);
-            statement.setString(3, contact.postalCode);
-            statement.setString(4, contact.phoneNumber);
-            statement.setString(5, contact.firstName);
-            statement.setString(6, contact.lastName);
-            statement.executeUpdate();
+            statement.setString(1, contact.getFirstName());
+            statement.setString(2, contact.getLastName());
+            statement.setString(3, contact.getStreet());
+            statement.setString(4, contact.getCity());
+            statement.setString(5, contact.getPostalCode());
+            statement.setString(6, contact.getPhoneNumber());
+            statement.setInt(7, contact.getId()); // Use the id to identify the contact
+            int updatedRows = statement.executeUpdate();
+
+            if (updatedRows == 0) {
+                throw new SQLException("Updating contact failed, no rows affected.");
+            }
         }
     }
 
@@ -70,14 +75,14 @@ class PostgreSQLContactDAO implements ContactDAO {
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
                     return new Contact(
+                            resultSet.getInt("id"),
                             resultSet.getString("first_name"),
                             resultSet.getString("last_name"),
                             resultSet.getString("street"),
                             resultSet.getString("city"),
                             resultSet.getString("postal_code"),
                             resultSet.getString("phone_number")
-                    ) {
-                    };
+                    );
                 }
             }
         }
@@ -92,14 +97,14 @@ class PostgreSQLContactDAO implements ContactDAO {
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
                     Contact contact = new Contact(
+                            resultSet.getInt("id"),
                             resultSet.getString("first_name"),
                             resultSet.getString("last_name"),
                             resultSet.getString("street"),
                             resultSet.getString("city"),
                             resultSet.getString("postal_code"),
                             resultSet.getString("phone_number")
-                    ) {
-                    };
+                    );
                     contactList.add(contact);
                 }
             }
@@ -107,4 +112,3 @@ class PostgreSQLContactDAO implements ContactDAO {
         return contactList.toArray(new Contact[0]);
     }
 }
-

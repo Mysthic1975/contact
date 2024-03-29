@@ -1,13 +1,14 @@
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.sql.SQLException;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ContactGUI extends JFrame {
-    private ContactDAO contactDAO;
+    private final ContactDAO contactDAO;
+    private static final Logger LOGGER = Logger.getLogger(ContactGUI.class.getName());
 
     private JTable contactTable;
     private DefaultTableModel tableModel;
@@ -58,7 +59,7 @@ public class ContactGUI extends JFrame {
                 addContactToTable(contact);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Error loading contacts from database.", e);
             JOptionPane.showMessageDialog(this, "Error loading contacts from database.");
         }
     }
@@ -80,29 +81,49 @@ public class ContactGUI extends JFrame {
         JButton editButton = new JButton("Edit Contact");
         JButton deleteButton = new JButton("Delete Contact");
 
-        addButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // Open a dialog for adding a new contact
-                new AddContactDialog(ContactGUI.this, contactDAO);
+        addButton.addActionListener(_ -> new AddContactDialog(ContactGUI.this, contactDAO));
+
+        editButton.addActionListener(_ -> {
+            int selectedRow = contactTable.getSelectedRow();
+            if (selectedRow >= 0) {
+                String firstName = (String) tableModel.getValueAt(selectedRow, 0);
+                String lastName = (String) tableModel.getValueAt(selectedRow, 1);
+                try {
+                    Contact selectedContact = contactDAO.getContact(firstName, lastName);
+                    if (selectedContact != null) {
+                        new EditContactDialog(ContactGUI.this, contactDAO, selectedContact);
+                        loadContacts(); // Reload contacts after editing
+                    } else {
+                        JOptionPane.showMessageDialog(ContactGUI.this, "Error: Selected contact not found.");
+                    }
+                } catch (SQLException ex) {
+                    LOGGER.log(Level.SEVERE, "Error retrieving contact.", ex);
+                    JOptionPane.showMessageDialog(ContactGUI.this, "Error retrieving contact.");
+                }
+            } else {
+                JOptionPane.showMessageDialog(ContactGUI.this, "Please select a contact to edit.");
             }
         });
 
-        editButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // Get selected row from table
-                // Open a dialog for editing the selected contact
-                // Implement this method
-            }
-        });
-
-        deleteButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // Get selected row from table
-                // Delete the contact associated with the selected row
-                // Implement this method
+        deleteButton.addActionListener(_ -> {
+            int selectedRow = contactTable.getSelectedRow();
+            if (selectedRow >= 0) {
+                String firstName = (String) tableModel.getValueAt(selectedRow, 0);
+                String lastName = (String) tableModel.getValueAt(selectedRow, 1);
+                try {
+                    Contact selectedContact = contactDAO.getContact(firstName, lastName);
+                    if (selectedContact != null) {
+                        contactDAO.deleteContact(selectedContact);
+                        tableModel.removeRow(selectedRow);
+                    } else {
+                        JOptionPane.showMessageDialog(ContactGUI.this, "Error: Selected contact not found.");
+                    }
+                } catch (SQLException ex) {
+                    LOGGER.log(Level.SEVERE, "Error deleting contact.", ex);
+                    JOptionPane.showMessageDialog(ContactGUI.this, "Error deleting contact.");
+                }
+            } else {
+                JOptionPane.showMessageDialog(ContactGUI.this, "Please select a contact to delete.");
             }
         });
 
