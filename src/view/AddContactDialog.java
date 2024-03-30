@@ -1,6 +1,6 @@
 package view;
 
-import dao.ContactDAO;
+import controller.ContactController;
 import model.Contact;
 
 import javax.swing.*;
@@ -15,7 +15,7 @@ public class AddContactDialog extends JDialog {
     private final JTextField postalCodeField;
     private final JTextField phoneNumberField;
 
-    public AddContactDialog(JFrame parent, ContactDAO contactDAO) {
+    public AddContactDialog(JFrame parent, ContactController contactController) {
         super(parent, "Add model.Contact", true);
 
         // Create and configure input fields
@@ -26,7 +26,7 @@ public class AddContactDialog extends JDialog {
         postalCodeField = new JTextField(10);
         phoneNumberField = new JTextField(15);
 
-// Create and configure labels for input fields
+        // Create and configure labels for input fields
         JLabel firstNameLabel = new JLabel("Vorname:");
         JLabel lastNameLabel = new JLabel("Nachname:");
         JLabel streetLabel = new JLabel("Straße:");
@@ -54,13 +54,13 @@ public class AddContactDialog extends JDialog {
                 return;
             }
 
-// Check if the phone number contains only digits
+            // Check if the phone number contains only digits
             if (!phoneNumber.matches("\\d+")) {
                 JOptionPane.showMessageDialog(this, "Die Telefonnummer sollte nur Ziffern enthalten.");
                 return;
             }
 
-// Check if the name contains only letters
+            // Check if the name contains only letters
             if (!firstName.matches("[a-zA-ZäöüÄÖÜß]+") || !lastName.matches("[a-zA-ZäöüÄÖÜß]+")) {
                 JOptionPane.showMessageDialog(this, "Vorname und Nachname sollten nur Buchstaben enthalten.");
                 return;
@@ -76,7 +76,7 @@ public class AddContactDialog extends JDialog {
 
             // Add contact to database
             try {
-                contactDAO.addContact(newContact);
+                contactController.addContact(newContact);
                 dispose(); // Close dialog after adding contact
             } catch (SQLException ex) {
                 JOptionPane.showMessageDialog(AddContactDialog.this, STR."Error adding contact: \{ex.getMessage()}");
@@ -118,4 +118,3 @@ public class AddContactDialog extends JDialog {
         setVisible(true);
     }
 }
-

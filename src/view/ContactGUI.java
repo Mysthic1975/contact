@@ -1,6 +1,6 @@
 package view;
 
-import dao.ContactDAO;
+import controller.ContactController;
 import model.Contact;
 
 import javax.swing.*;
@@ -12,14 +12,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class ContactGUI extends JFrame {
-    private final ContactDAO contactDAO;
+    private final ContactController contactController;
     private static final Logger LOGGER = Logger.getLogger(ContactGUI.class.getName());
 
     private JTable contactTable;
     private DefaultTableModel tableModel;
 
-    public ContactGUI(ContactDAO contactDAO) {
-        this.contactDAO = contactDAO;
+    public ContactGUI(ContactController contactController) {
+        this.contactController = contactController;
 
         setTitle("model.Contact Manager");
         setSize(600, 400);
@@ -60,8 +60,8 @@ public class ContactGUI extends JFrame {
 
     private void loadContacts() {
         try {
-            // Retrieve contacts from the database using your dao.ContactDAO
-            Contact[] contacts = contactDAO.getAllContacts();
+            // Retrieve contacts from the database using your ContactController
+            Contact[] contacts = contactController.getAllContacts();
 
             // Clear existing table data
             tableModel.setRowCount(0);
@@ -94,7 +94,7 @@ public class ContactGUI extends JFrame {
         JButton deleteButton = new JButton("Kontakt löschen");
 
         addButton.addActionListener(_ -> {
-            new AddContactDialog(ContactGUI.this, contactDAO);
+            new AddContactDialog(ContactGUI.this, contactController);
             loadContacts(); // Reload contacts after adding
         });
 
@@ -104,9 +104,9 @@ public class ContactGUI extends JFrame {
                 String firstName = (String) tableModel.getValueAt(selectedRow, 0);
                 String lastName = (String) tableModel.getValueAt(selectedRow, 1);
                 try {
-                    Contact selectedContact = contactDAO.getContact(firstName, lastName);
+                    Contact selectedContact = contactController.getContact(firstName, lastName);
                     if (selectedContact != null) {
-                        new EditContactDialog(ContactGUI.this, contactDAO, selectedContact);
+                        new EditContactDialog(ContactGUI.this, contactController, selectedContact);
                         loadContacts(); // Reload contacts after editing
                     } else {
                         JOptionPane.showMessageDialog(ContactGUI.this, "Error: Selected contact not found.");
@@ -126,7 +126,7 @@ public class ContactGUI extends JFrame {
                 String firstName = (String) tableModel.getValueAt(selectedRow, 0);
                 String lastName = (String) tableModel.getValueAt(selectedRow, 1);
                 try {
-                    Contact selectedContact = contactDAO.getContact(firstName, lastName);
+                    Contact selectedContact = contactController.getContact(firstName, lastName);
                     if (selectedContact != null) {
                         // Show confirmation dialog before deleting
                         int response = JOptionPane.showConfirmDialog(
@@ -137,7 +137,7 @@ public class ContactGUI extends JFrame {
                                 JOptionPane.QUESTION_MESSAGE
                         );
                         if (response == JOptionPane.YES_OPTION) {
-                            contactDAO.deleteContact(selectedContact);
+                            contactController.deleteContact(selectedContact);
                             tableModel.removeRow(selectedRow);
                         }
                     } else {

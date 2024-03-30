@@ -1,6 +1,6 @@
 package view;
 
-import dao.ContactDAO;
+import controller.ContactController;
 import model.Contact;
 
 import javax.swing.*;
@@ -15,7 +15,7 @@ public class EditContactDialog extends JDialog {
     private final JTextField postalCodeField;
     private final JTextField phoneNumberField;
 
-    public EditContactDialog(JFrame parent, ContactDAO contactDAO, Contact contact) {
+    public EditContactDialog(JFrame parent, ContactController contactController, Contact contact) {
         super(parent, "Kontakt bearbeiten", true);
 
         // Create and configure input fields
@@ -87,7 +87,7 @@ public class EditContactDialog extends JDialog {
 
             // Update contact in database
             try {
-                contactDAO.updateContact(contact); // Use the updated contact with the id
+                contactController.updateContact(contact); // Use the updated contact with the id
                 dispose(); // Close dialog after updating contact
             } catch (SQLException ex) {
                 JOptionPane.showMessageDialog(EditContactDialog.this, STR."Fehler beim Aktualisieren des Kontakts: \{ex.getMessage()}");
