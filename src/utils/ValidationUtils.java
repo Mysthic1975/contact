@@ -28,4 +28,12 @@ public class ValidationUtils {
 
         return false;
     }
+
+    public static boolean validateSelectedRow(int selectedRow, Component parentComponent) {
+        if (selectedRow < 0) {
+            JOptionPane.showMessageDialog(parentComponent, "Bitte wählen Sie einen Kontakt aus.");
+            return false;
+        }
+        return true;
+    }
 }

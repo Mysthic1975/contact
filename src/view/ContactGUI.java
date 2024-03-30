@@ -2,6 +2,7 @@ package view;
 
 import controller.ContactController;
 import model.Contact;
+import utils.ValidationUtils;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -99,8 +100,9 @@ public class ContactGUI extends JFrame {
         });
 
         editButton.addActionListener(_ -> {
-            int selectedRow = contactTable.convertRowIndexToModel(contactTable.getSelectedRow());
-            if (selectedRow >= 0) {
+            int selectedRow = contactTable.getSelectedRow();
+            if (ValidationUtils.validateSelectedRow(selectedRow, ContactGUI.this)) {
+                selectedRow = contactTable.convertRowIndexToModel(selectedRow);
                 String firstName = (String) tableModel.getValueAt(selectedRow, 0);
                 String lastName = (String) tableModel.getValueAt(selectedRow, 1);
                 try {
@@ -115,14 +117,13 @@ public class ContactGUI extends JFrame {
                     LOGGER.log(Level.SEVERE, "Error retrieving contact.", ex);
                     JOptionPane.showMessageDialog(ContactGUI.this, "Error retrieving contact.");
                 }
-            } else {
-                JOptionPane.showMessageDialog(ContactGUI.this, "Bitte wählen Sie einen Kontakt zum Bearbeiten aus.");
             }
         });
 
         deleteButton.addActionListener(_ -> {
-            int selectedRow = contactTable.convertRowIndexToModel(contactTable.getSelectedRow());
-            if (selectedRow >= 0) {
+            int selectedRow = contactTable.getSelectedRow();
+            if (ValidationUtils.validateSelectedRow(selectedRow, ContactGUI.this)) {
+                selectedRow = contactTable.convertRowIndexToModel(selectedRow);
                 String firstName = (String) tableModel.getValueAt(selectedRow, 0);
                 String lastName = (String) tableModel.getValueAt(selectedRow, 1);
                 try {
@@ -147,8 +148,6 @@ public class ContactGUI extends JFrame {
                     LOGGER.log(Level.SEVERE, "Error deleting contact.", ex);
                     JOptionPane.showMessageDialog(ContactGUI.this, "Error deleting contact.");
                 }
-            } else {
-                JOptionPane.showMessageDialog(ContactGUI.this, "Bitte wählen Sie einen Kontakt zum Löschen aus.");
             }
         });
 
