@@ -20,8 +20,8 @@ public class PostgreSQLContactDAO implements ContactDAO {
             connection = DriverManager.getConnection(url, username, password);
 
             // Check if table exists and create it if not
-            String checkTableQuery = "SELECT to_regclass('public.contacts')";
-            String createTableQuery = "CREATE TABLE contacts (" +
+            String checkTableQuery = "SELECT tablename FROM pg_tables WHERE schemaname = 'public' AND tablename = 'contacts'";
+            String createTableQuery = "CREATE TABLE public.contacts (" +
                     "id SERIAL PRIMARY KEY," +
                     "first_name VARCHAR(50)," +
                     "last_name VARCHAR(50)," +
@@ -33,7 +33,7 @@ public class PostgreSQLContactDAO implements ContactDAO {
 
             try (Statement statement = connection.createStatement()) {
                 ResultSet resultSet = statement.executeQuery(checkTableQuery);
-                if (resultSet.next() && resultSet.getString(1) == null) {
+                if (!(resultSet.next() && resultSet.getString(1) != null)) {
                     // Table does not exist, create it
                     statement.execute(createTableQuery);
                 }
