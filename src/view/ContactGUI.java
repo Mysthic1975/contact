@@ -99,7 +99,7 @@ public class ContactGUI extends JFrame {
         });
 
         editButton.addActionListener(_ -> {
-            int selectedRow = contactTable.getSelectedRow();
+            int selectedRow = contactTable.convertRowIndexToModel(contactTable.getSelectedRow());
             if (selectedRow >= 0) {
                 String firstName = (String) tableModel.getValueAt(selectedRow, 0);
                 String lastName = (String) tableModel.getValueAt(selectedRow, 1);
@@ -121,7 +121,7 @@ public class ContactGUI extends JFrame {
         });
 
         deleteButton.addActionListener(_ -> {
-            int selectedRow = contactTable.getSelectedRow();
+            int selectedRow = contactTable.convertRowIndexToModel(contactTable.getSelectedRow());
             if (selectedRow >= 0) {
                 String firstName = (String) tableModel.getValueAt(selectedRow, 0);
                 String lastName = (String) tableModel.getValueAt(selectedRow, 1);

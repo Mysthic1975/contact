@@ -2,12 +2,15 @@ package view;
 
 import controller.ContactController;
 import model.Contact;
+import utils.ValidationUtils;
 
 import javax.swing.*;
 import java.awt.*;
 import java.sql.SQLException;
 
 public class EditContactDialog extends JDialog {
+    private static final int TEXT_FIELD_SIZE = 20;
+
     private final JTextField firstNameField;
     private final JTextField lastNameField;
     private final JTextField streetField;
@@ -19,12 +22,12 @@ public class EditContactDialog extends JDialog {
         super(parent, "Kontakt bearbeiten", true);
 
         // Create and configure input fields
-        firstNameField = new JTextField(20);
-        lastNameField = new JTextField(20);
-        streetField = new JTextField(20);
-        cityField = new JTextField(20);
-        postalCodeField = new JTextField(10);
-        phoneNumberField = new JTextField(15);
+        firstNameField = new JTextField(TEXT_FIELD_SIZE);
+        lastNameField = new JTextField(TEXT_FIELD_SIZE);
+        streetField = new JTextField(TEXT_FIELD_SIZE);
+        cityField = new JTextField(TEXT_FIELD_SIZE);
+        postalCodeField = new JTextField(TEXT_FIELD_SIZE);
+        phoneNumberField = new JTextField(TEXT_FIELD_SIZE);
 
         // Load contact data into fields
         firstNameField.setText(contact.getFirstName());
@@ -57,23 +60,7 @@ public class EditContactDialog extends JDialog {
             String phoneNumber = phoneNumberField.getText();
 
             // Validate input
-            if (firstName.isEmpty() || lastName.isEmpty()) {
-                JOptionPane.showMessageDialog(EditContactDialog.this, "Bitte geben Sie einen Vornamen und Nachnamen ein.");
-                return;
-            }
-
-            if (!phoneNumber.matches("\\d+")) {
-                JOptionPane.showMessageDialog(this, "Die Telefonnummer sollte nur Ziffern enthalten.");
-                return;
-            }
-
-            if (!firstName.matches("[a-zA-ZäöüÄÖÜß]+") || !lastName.matches("[a-zA-ZäöüÄÖÜß]+")) {
-                JOptionPane.showMessageDialog(this, "Vorname und Nachname sollten nur Buchstaben enthalten.");
-                return;
-            }
-
-            if (!postalCode.matches("\\d+")) {
-                JOptionPane.showMessageDialog(this, "Die Postleitzahl sollte nur Ziffern enthalten.");
+            if (ValidationUtils.validateInputFields(firstName, lastName, phoneNumber, postalCode, this)) {
                 return;
             }
 
