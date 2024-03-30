@@ -111,7 +111,7 @@ public class ContactGUI extends JFrame {
                     JOptionPane.showMessageDialog(ContactGUI.this, "Error retrieving contact.");
                 }
             } else {
-                JOptionPane.showMessageDialog(ContactGUI.this, "Please select a contact to edit.");
+                JOptionPane.showMessageDialog(ContactGUI.this, "Bitte wählen Sie einen Kontakt zum Bearbeiten aus.");
             }
         });
 
@@ -143,7 +143,7 @@ public class ContactGUI extends JFrame {
                     JOptionPane.showMessageDialog(ContactGUI.this, "Error deleting contact.");
                 }
             } else {
-                JOptionPane.showMessageDialog(ContactGUI.this, "Please select a contact to delete.");
+                JOptionPane.showMessageDialog(ContactGUI.this, "Bitte wählen Sie einen Kontakt zum Löschen aus.");
             }
         });
 
