@@ -16,7 +16,7 @@ public class AddContactDialog extends JDialog {
     private final JTextField phoneNumberField;
 
     public AddContactDialog(JFrame parent, ContactController contactController) {
-        super(parent, "Add model.Contact", true);
+        super(parent, "Kontakt hinzufügen", true);
 
         // Create and configure input fields
         firstNameField = new JTextField(20);

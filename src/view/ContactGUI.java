@@ -21,7 +21,7 @@ public class ContactGUI extends JFrame {
     public ContactGUI(ContactController contactController) {
         this.contactController = contactController;
 
-        setTitle("model.Contact Manager");
+        setTitle("Kontaktverwaltung");
         setSize(600, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
