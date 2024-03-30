@@ -1,3 +1,8 @@
+package view;
+
+import dao.ContactDAO;
+import model.Contact;
+
 import javax.swing.*;
 import java.awt.*;
 import java.sql.SQLException;
@@ -11,7 +16,7 @@ public class AddContactDialog extends JDialog {
     private final JTextField phoneNumberField;
 
     public AddContactDialog(JFrame parent, ContactDAO contactDAO) {
-        super(parent, "Add Contact", true);
+        super(parent, "Add model.Contact", true);
 
         // Create and configure input fields
         firstNameField = new JTextField(20);

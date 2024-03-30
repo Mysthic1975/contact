@@ -1,3 +1,7 @@
+import dao.ContactDAO;
+import dao.PostgreSQLContactDAO;
+import view.ContactGUI;
+
 import javax.swing.*;
 
 public class Main {

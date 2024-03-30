@@ -1,3 +1,8 @@
+package view;
+
+import dao.ContactDAO;
+import model.Contact;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -16,7 +21,7 @@ public class ContactGUI extends JFrame {
     public ContactGUI(ContactDAO contactDAO) {
         this.contactDAO = contactDAO;
 
-        setTitle("Contact Manager");
+        setTitle("model.Contact Manager");
         setSize(600, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -55,7 +60,7 @@ public class ContactGUI extends JFrame {
 
     private void loadContacts() {
         try {
-            // Retrieve contacts from the database using your ContactDAO
+            // Retrieve contacts from the database using your dao.ContactDAO
             Contact[] contacts = contactDAO.getAllContacts();
 
             // Clear existing table data
@@ -84,9 +89,9 @@ public class ContactGUI extends JFrame {
 
     private void addButtons() {
         JPanel buttonPanel = new JPanel();
-        JButton addButton = new JButton("Add Contact");
-        JButton editButton = new JButton("Edit Contact");
-        JButton deleteButton = new JButton("Delete Contact");
+        JButton addButton = new JButton("Kontakt hinzufügen");
+        JButton editButton = new JButton("Kontakt bearbeiten");
+        JButton deleteButton = new JButton("Kontakt löschen");
 
         addButton.addActionListener(_ -> {
             new AddContactDialog(ContactGUI.this, contactDAO);

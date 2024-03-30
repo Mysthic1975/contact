@@ -1,13 +1,13 @@
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+package dao;
+
+import model.Contact;
+
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-class PostgreSQLContactDAO implements ContactDAO {
+public class PostgreSQLContactDAO implements ContactDAO {
     private Connection connection;
     private static final Logger LOGGER = Logger.getLogger(PostgreSQLContactDAO.class.getName());
 
@@ -27,12 +27,7 @@ class PostgreSQLContactDAO implements ContactDAO {
     public void addContact(Contact contact) throws SQLException {
         String query = "INSERT INTO contacts (first_name, last_name, street, city, postal_code, phone_number) VALUES (?, ?, ?, ?, ?, ?)";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setString(1, contact.firstName);
-            statement.setString(2, contact.lastName);
-            statement.setString(3, contact.street);
-            statement.setString(4, contact.city);
-            statement.setString(5, contact.postalCode);
-            statement.setString(6, contact.phoneNumber);
+            executeQueryAndProcessResults(contact, statement);
             statement.executeUpdate();
         }
     }
@@ -41,12 +36,7 @@ class PostgreSQLContactDAO implements ContactDAO {
     public void updateContact(Contact contact) throws SQLException {
         String query = "UPDATE contacts SET first_name=?, last_name=?, street=?, city=?, postal_code=?, phone_number=? WHERE id=?";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setString(1, contact.getFirstName());
-            statement.setString(2, contact.getLastName());
-            statement.setString(3, contact.getStreet());
-            statement.setString(4, contact.getCity());
-            statement.setString(5, contact.getPostalCode());
-            statement.setString(6, contact.getPhoneNumber());
+            executeQueryAndProcessResults(contact, statement);
             statement.setInt(7, contact.getId()); // Use the id to identify the contact
             int updatedRows = statement.executeUpdate();
 
@@ -56,12 +46,21 @@ class PostgreSQLContactDAO implements ContactDAO {
         }
     }
 
+    private void executeQueryAndProcessResults(Contact contact, PreparedStatement statement) throws SQLException {
+        statement.setString(1, contact.getFirstName());
+        statement.setString(2, contact.getLastName());
+        statement.setString(3, contact.getStreet());
+        statement.setString(4, contact.getCity());
+        statement.setString(5, contact.getPostalCode());
+        statement.setString(6, contact.getPhoneNumber());
+    }
+
     @Override
     public void deleteContact(Contact contact) throws SQLException {
         String query = "DELETE FROM contacts WHERE first_name=? AND last_name=?";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setString(1, contact.firstName);
-            statement.setString(2, contact.lastName);
+            statement.setString(1, contact.getFirstName());
+            statement.setString(2, contact.getLastName());
             statement.executeUpdate();
         }
     }

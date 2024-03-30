@@ -1,3 +1,7 @@
+package dao;
+
+import model.Contact;
+
 import java.sql.SQLException;
 
 public interface ContactDAO {

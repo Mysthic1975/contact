@@ -1,3 +1,8 @@
+package view;
+
+import dao.ContactDAO;
+import model.Contact;
+
 import javax.swing.*;
 import java.awt.*;
 import java.sql.SQLException;

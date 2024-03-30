@@ -1,3 +1,5 @@
+package model;
+
 public class Contact {
     protected int id;
     protected String firstName;
