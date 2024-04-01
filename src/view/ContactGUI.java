@@ -8,6 +8,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -18,6 +19,8 @@ public class ContactGUI extends JFrame {
 
     private JTable contactTable;
     private DefaultTableModel tableModel;
+    private JTextField filterTextField;
+    private JComboBox<String> filterComboBox;
 
     public ContactGUI(ContactController contactController) {
         this.contactController = contactController;
@@ -32,7 +35,43 @@ public class ContactGUI extends JFrame {
         // Add buttons for adding, editing, and deleting contacts
         addButtons();
 
+        // Add filter components
+        addFilterComponents();
+
         setVisible(true);
+    }
+
+    private void addFilterComponents() {
+        JPanel filterPanel = new JPanel();
+        filterTextField = new JTextField(20);
+        filterComboBox = new JComboBox<>(new String[]{"Vorname", "Nachname", "Stadt", "Postleitzahl", "Telefonnummer"});
+        JButton filterButton = new JButton("Filtern");
+        JButton showAllButton = new JButton("Alle anzeigen"); // Neuer Button
+
+        filterButton.addActionListener(_ -> {
+            String filterField = (String) filterComboBox.getSelectedItem();
+            String filterValue = filterTextField.getText();
+
+            try {
+                List<Contact> filteredContacts = contactController.getFilteredContacts(filterField, filterValue);
+                tableModel.setRowCount(0); // Clear existing table data
+                for (Contact contact : filteredContacts) {
+                    addContactToTable(contact);
+                }
+            } catch (SQLException e) {
+                LOGGER.log(Level.SEVERE, "Error filtering contacts.", e);
+                JOptionPane.showMessageDialog(this, "Error filtering contacts.");
+            }
+        });
+
+        // Fügt einen ActionListener zum "Alle anzeigen" Button hinzu
+        showAllButton.addActionListener(_ -> loadContacts());
+
+        filterPanel.add(filterComboBox);
+        filterPanel.add(filterTextField);
+        filterPanel.add(filterButton);
+        filterPanel.add(showAllButton); // Fügt den "Alle anzeigen" Button zum Panel hinzu
+        add(filterPanel, BorderLayout.NORTH);
     }
 
     private void createTable() {
