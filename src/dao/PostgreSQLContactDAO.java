@@ -14,7 +14,7 @@ public class PostgreSQLContactDAO implements ContactDAO {
     public PostgreSQLContactDAO() {
         try {
             // Set up connection to the database
-            String url = "jdbc:postgresql://localhost:5432/contact";
+            String url = "jdbc:postgresql://localhost:5432/postgres";
             String username = "postgres";
             String password = "admin";
             connection = DriverManager.getConnection(url, username, password);
