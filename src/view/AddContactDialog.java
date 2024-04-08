@@ -64,7 +64,8 @@ public class AddContactDialog extends JDialog {
                 contactController.addContact(newContact);
                 dispose(); // Close dialog after adding contact
             } catch (SQLException ex) {
-                JOptionPane.showMessageDialog(AddContactDialog.this, STR."Error adding contact: \{ex.getMessage()}");
+                String errorMessage = String.format("Error adding contact: %s", ex.getMessage());
+                JOptionPane.showMessageDialog(AddContactDialog.this, errorMessage);
             }
         });
 

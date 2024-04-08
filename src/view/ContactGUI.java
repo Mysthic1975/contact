@@ -5,6 +5,7 @@ import model.Contact;
 import utils.ValidationUtils;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.sql.SQLException;
@@ -91,8 +92,34 @@ public class ContactGUI extends JFrame {
 
         contactTable = new JTable(tableModel);
         contactTable.setAutoCreateRowSorter(true);
+
+        // Set the background color of the table
+        contactTable.setBackground(Color.BLUE);
+
+        // Set the background color of the cells
+        contactTable.setDefaultRenderer(Object.class, new DefaultTableCellRenderer(){
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                c.setBackground(Color.LIGHT_GRAY);
+                return c;
+            }
+        });
+
         JScrollPane scrollPane = new JScrollPane(contactTable);
-        add(scrollPane, BorderLayout.CENTER);
+        scrollPane.getViewport().setBackground(Color.darkGray);
+
+        // Create a JPanel as a container
+        JPanel tableContainer = new JPanel(new BorderLayout());
+
+        // Add some padding to the container
+        tableContainer.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        // Add the scrollPane to the container
+        tableContainer.add(scrollPane, BorderLayout.CENTER);
+
+        // Add the container to the frame instead of the scrollPane
+        add(tableContainer, BorderLayout.CENTER);
 
         // Load existing contacts into the table
         loadContacts();
@@ -171,7 +198,7 @@ public class ContactGUI extends JFrame {
                         // Show confirmation dialog before deleting
                         int response = JOptionPane.showConfirmDialog(
                                 ContactGUI.this,
-                                STR."Möchten Sie \{firstName} \{lastName} wirklich löschen?",
+                                String.format("Möchten Sie %s %s wirklich löschen?", firstName, lastName),
                                 "Bestätigen",
                                 JOptionPane.YES_NO_OPTION,
                                 JOptionPane.QUESTION_MESSAGE

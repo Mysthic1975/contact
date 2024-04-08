@@ -39,7 +39,7 @@ public class PostgreSQLContactDAO implements ContactDAO {
                 }
             }
         } catch (SQLException e) {
-            LOGGER.severe(STR."Error connecting to database: \{e.getMessage()}");
+            LOGGER.severe(String.format("Error connecting to database: %s", e.getMessage()));
         }
     }
 

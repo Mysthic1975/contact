@@ -77,7 +77,7 @@ public class EditContactDialog extends JDialog {
                 contactController.updateContact(contact); // Use the updated contact with the id
                 dispose(); // Close dialog after updating contact
             } catch (SQLException ex) {
-                JOptionPane.showMessageDialog(EditContactDialog.this, STR."Fehler beim Aktualisieren des Kontakts: \{ex.getMessage()}");
+                JOptionPane.showMessageDialog(EditContactDialog.this, String.format("Fehler beim Aktualisieren des Kontakts: %s", ex.getMessage()));
             }
         });
 
