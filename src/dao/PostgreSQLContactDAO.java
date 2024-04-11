@@ -5,19 +5,17 @@ import model.Contact;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 public class PostgreSQLContactDAO implements ContactDAO {
-    private Connection connection1;
-    private Connection connection2;
-    private static final Logger LOGGER = Logger.getLogger(PostgreSQLContactDAO.class.getName());
+    private final Connection connection1;
+    private final Connection connection2;
 
     public PostgreSQLContactDAO() throws SQLException {
         // Set up connection to the first database
-        connection1 = createConnection("jdbc:postgresql://localhost:5432/postgres", "postgres", "admin");
+        connection1 = createConnection("jdbc:postgresql://localhost:5432/postgres");
 
         // Set up connection to the second database (backup)
-        connection2 = createConnection("jdbc:postgresql://localhost:5433/postgres", "postgres", "admin");
+        connection2 = createConnection("jdbc:postgresql://localhost:5433/postgres");
 
         // Ensure the contacts table exists in both databases
         ensureTableExists(connection1);
@@ -39,8 +37,8 @@ public class PostgreSQLContactDAO implements ContactDAO {
         }
     }
 
-    private Connection createConnection(String url, String username, String password) throws SQLException {
-        return DriverManager.getConnection(url, username, password);
+    private Connection createConnection(String url) throws SQLException {
+        return DriverManager.getConnection(url, "postgres", "admin");
     }
 
     @Override
@@ -80,46 +78,49 @@ public class PostgreSQLContactDAO implements ContactDAO {
     @Override
     public void deleteContact(Contact contact) throws SQLException {
         String query = "DELETE FROM contacts WHERE first_name=? AND last_name=?";
-        executeQueryOnBothDatabases(query, contact);
+        try (PreparedStatement statement1 = connection1.prepareStatement(query);
+             PreparedStatement statement2 = connection2.prepareStatement(query)) {
+            executeDeleteQuery(contact, statement1);
+            executeDeleteQuery(contact, statement2);
+        }
+    }
+
+    private void executeDeleteQuery(Contact contact, PreparedStatement statement) throws SQLException {
+        statement.setString(1, contact.getFirstName());
+        statement.setString(2, contact.getLastName());
+        statement.executeUpdate();
     }
 
     @Override
     public Contact getContact(String firstName, String lastName) throws SQLException {
         String query = "SELECT * FROM contacts WHERE first_name=? AND last_name=?";
         try (PreparedStatement statement = connection1.prepareStatement(query)) {
-            statement.setString(1, firstName);
-            statement.setString(2, lastName);
-            try (ResultSet resultSet = statement.executeQuery()) {
-                if (resultSet.next()) {
-                    return new Contact(
-                            resultSet.getInt("id"),
-                            resultSet.getString("first_name"),
-                            resultSet.getString("last_name"),
-                            resultSet.getString("street"),
-                            resultSet.getString("city"),
-                            resultSet.getString("postal_code"),
-                            resultSet.getString("phone_number")
-                    );
-                }
-            }
+            Contact resultSet = getContact(firstName, lastName, statement);
+            if (resultSet != null) return resultSet;
         } catch (SQLException e) {
             // If an error occurs with the first database, try with the second one
             try (PreparedStatement statement = connection2.prepareStatement(query)) {
-                statement.setString(1, firstName);
-                statement.setString(2, lastName);
-                try (ResultSet resultSet = statement.executeQuery()) {
-                    if (resultSet.next()) {
-                        return new Contact(
-                                resultSet.getInt("id"),
-                                resultSet.getString("first_name"),
-                                resultSet.getString("last_name"),
-                                resultSet.getString("street"),
-                                resultSet.getString("city"),
-                                resultSet.getString("postal_code"),
-                                resultSet.getString("phone_number")
-                        );
-                    }
-                }
+                Contact resultSet = getContact(firstName, lastName, statement);
+                if (resultSet != null) return resultSet;
+            }
+        }
+        return null;
+    }
+
+    private Contact getContact(String firstName, String lastName, PreparedStatement statement) throws SQLException {
+        statement.setString(1, firstName);
+        statement.setString(2, lastName);
+        try (ResultSet resultSet = statement.executeQuery()) {
+            if (resultSet.next()) {
+                return new Contact(
+                        resultSet.getInt("id"),
+                        resultSet.getString("first_name"),
+                        resultSet.getString("last_name"),
+                        resultSet.getString("street"),
+                        resultSet.getString("city"),
+                        resultSet.getString("postal_code"),
+                        resultSet.getString("phone_number")
+                );
             }
         }
         return null;
@@ -130,39 +131,30 @@ public class PostgreSQLContactDAO implements ContactDAO {
         List<Contact> contactList = new ArrayList<>();
         String query = "SELECT * FROM contacts";
         try (PreparedStatement statement = connection1.prepareStatement(query)) {
-            try (ResultSet resultSet = statement.executeQuery()) {
-                while (resultSet.next()) {
-                    Contact contact = new Contact(
-                            resultSet.getInt("id"),
-                            resultSet.getString("first_name"),
-                            resultSet.getString("last_name"),
-                            resultSet.getString("street"),
-                            resultSet.getString("city"),
-                            resultSet.getString("postal_code"),
-                            resultSet.getString("phone_number")
-                    );
-                    contactList.add(contact);
-                }
-            }
+            getAllContacts(contactList, statement);
         } catch (SQLException e) {
             // If an error occurs with the first database, try with the second one
             try (PreparedStatement statement = connection2.prepareStatement(query)) {
-                try (ResultSet resultSet = statement.executeQuery()) {
-                    while (resultSet.next()) {
-                        Contact contact = new Contact(
-                                resultSet.getInt("id"),
-                                resultSet.getString("first_name"),
-                                resultSet.getString("last_name"),
-                                resultSet.getString("street"),
-                                resultSet.getString("city"),
-                                resultSet.getString("postal_code"),
-                                resultSet.getString("phone_number")
-                        );
-                        contactList.add(contact);
-                    }
-                }
+                getAllContacts(contactList, statement);
             }
         }
         return contactList.toArray(new Contact[0]);
+    }
+
+    private void getAllContacts(List<Contact> contactList, PreparedStatement statement) throws SQLException {
+        try (ResultSet resultSet = statement.executeQuery()) {
+            while (resultSet.next()) {
+                Contact contact = new Contact(
+                        resultSet.getInt("id"),
+                        resultSet.getString("first_name"),
+                        resultSet.getString("last_name"),
+                        resultSet.getString("street"),
+                        resultSet.getString("city"),
+                        resultSet.getString("postal_code"),
+                        resultSet.getString("phone_number")
+                );
+                contactList.add(contact);
+            }
+        }
     }
 }
