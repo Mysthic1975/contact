@@ -12,10 +12,10 @@ public class PostgreSQLContactDAO implements ContactDAO {
 
     public PostgreSQLContactDAO() throws SQLException {
         // Set up connection to the first database
-        connection1 = createConnection("jdbc:postgresql://localhost:5432/postgres");
+        connection1 = createConnection("jdbc:postgresql://localhost:5433/postgres");
 
         // Set up connection to the second database (backup)
-        connection2 = createConnection("jdbc:postgresql://localhost:5433/postgres");
+        connection2 = createConnection("jdbc:postgresql://localhost:5434/postgres");
 
         // Ensure the contacts table exists in both databases
         ensureTableExists(connection1);
