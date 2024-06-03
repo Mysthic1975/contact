@@ -9,7 +9,7 @@ public class Contact {
     protected String postalCode;
     protected String phoneNumber;
 
-    // Constructor used when creating a new contact (without id)
+    // Konstruktor, der verwendet wird, wenn ein neuer Kontakt erstellt wird (ohne ID)
     public Contact(String firstName, String lastName, String street, String city, String postalCode, String phoneNumber) {
         this.firstName = firstName;
         this.lastName = lastName;
@@ -19,7 +19,7 @@ public class Contact {
         this.phoneNumber = phoneNumber;
     }
 
-    // Constructor used when retrieving a contact from the database (with id)
+    // Konstruktor, der verwendet wird, wenn ein Kontakt aus der Datenbank abgerufen wird (mit ID)
     public Contact(int id, String firstName, String lastName, String street, String city, String postalCode, String phoneNumber) {
         this.id = id;
         this.firstName = firstName;
@@ -66,27 +66,27 @@ public class Contact {
         );
     }
 
-        public void setFirstName(String firstName) {
-            this.firstName = firstName;
-        }
-
-        public void setLastName(String lastName) {
-            this.lastName = lastName;
-        }
-
-        public void setStreet(String street) {
-            this.street = street;
-        }
-
-        public void setCity(String city) {
-            this.city = city;
-        }
-
-        public void setPostalCode(String postalCode) {
-            this.postalCode = postalCode;
-        }
-
-        public void setPhoneNumber(String phoneNumber) {
-            this.phoneNumber = phoneNumber;
-        }
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
     }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public void setStreet(String street) {
+        this.street = street;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public void setPostalCode(String postalCode) {
+        this.postalCode = postalCode;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+}

@@ -7,21 +7,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PostgreSQLContactDAO implements ContactDAO {
+    // Verbindungen zu den beiden Datenbanken
     private final Connection connection1;
     private final Connection connection2;
 
     public PostgreSQLContactDAO() throws SQLException {
-        // Set up connection to the first database
+        // Verbindung zur ersten Datenbank herstellen
         connection1 = createConnection("jdbc:postgresql://localhost:5433/postgres");
 
-        // Set up connection to the second database (backup)
+        // Verbindung zur zweiten Datenbank (Backup) herstellen
         connection2 = createConnection("jdbc:postgresql://localhost:5434/postgres");
 
-        // Ensure the contacts table exists in both databases
+        // Stellen Sie sicher, dass die Kontakte-Tabelle in beiden Datenbanken existiert
         ensureTableExists(connection1);
         ensureTableExists(connection2);
     }
 
+    // Methode zum Erstellen der Kontakte-Tabelle, falls sie nicht existiert
     private void ensureTableExists(Connection connection) throws SQLException {
         String query = "CREATE TABLE IF NOT EXISTS contacts (" +
                 "id SERIAL PRIMARY KEY," +
@@ -37,22 +39,26 @@ public class PostgreSQLContactDAO implements ContactDAO {
         }
     }
 
+    // Methode zum Herstellen einer Verbindung zur Datenbank
     private Connection createConnection(String url) throws SQLException {
         return DriverManager.getConnection(url, "postgres", "admin");
     }
 
+    // Implementierung der addContact-Methode aus dem ContactDAO-Interface
     @Override
     public void addContact(Contact contact) throws SQLException {
         String query = "INSERT INTO contacts (first_name, last_name, street, city, postal_code, phone_number) VALUES (?, ?, ?, ?, ?, ?)";
         executeQueryOnBothDatabases(query, contact);
     }
 
+    // Implementierung der updateContact-Methode aus dem ContactDAO-Interface
     @Override
     public void updateContact(Contact contact) throws SQLException {
         String query = "UPDATE contacts SET first_name=?, last_name=?, street=?, city=?, postal_code=?, phone_number=? WHERE id=?";
         executeQueryOnBothDatabases(query, contact);
     }
 
+    // Methode zum Ausführen einer Abfrage auf beiden Datenbanken
     private void executeQueryOnBothDatabases(String query, Contact contact) throws SQLException {
         try (PreparedStatement statement1 = connection1.prepareStatement(query);
              PreparedStatement statement2 = connection2.prepareStatement(query)) {
@@ -63,6 +69,7 @@ public class PostgreSQLContactDAO implements ContactDAO {
         }
     }
 
+    // Methode zum Ausführen einer Abfrage und Verarbeiten der Ergebnisse
     private void executeQueryAndProcessResults(Contact contact, PreparedStatement statement) throws SQLException {
         statement.setString(1, contact.getFirstName());
         statement.setString(2, contact.getLastName());
@@ -71,10 +78,11 @@ public class PostgreSQLContactDAO implements ContactDAO {
         statement.setString(5, contact.getPostalCode());
         statement.setString(6, contact.getPhoneNumber());
         if (contact.getId() != 0) {
-            statement.setInt(7, contact.getId()); // Use the id to identify the contact
+            statement.setInt(7, contact.getId()); // Verwenden Sie die ID, um den Kontakt zu identifizieren
         }
     }
 
+    // Implementierung der deleteContact-Methode aus dem ContactDAO-Interface
     @Override
     public void deleteContact(Contact contact) throws SQLException {
         String query = "DELETE FROM contacts WHERE first_name=? AND last_name=?";
@@ -85,12 +93,14 @@ public class PostgreSQLContactDAO implements ContactDAO {
         }
     }
 
+    // Methode zum Ausführen einer Löschabfrage
     private void executeDeleteQuery(Contact contact, PreparedStatement statement) throws SQLException {
         statement.setString(1, contact.getFirstName());
         statement.setString(2, contact.getLastName());
         statement.executeUpdate();
     }
 
+    // Implementierung der getContact-Methode aus dem ContactDAO-Interface
     @Override
     public Contact getContact(String firstName, String lastName) throws SQLException {
         String query = "SELECT * FROM contacts WHERE first_name=? AND last_name=?";
@@ -98,7 +108,7 @@ public class PostgreSQLContactDAO implements ContactDAO {
             Contact resultSet = getContact(firstName, lastName, statement);
             if (resultSet != null) return resultSet;
         } catch (SQLException e) {
-            // If an error occurs with the first database, try with the second one
+            // Wenn ein Fehler mit der ersten Datenbank auftritt, versuchen Sie es mit der zweiten
             try (PreparedStatement statement = connection2.prepareStatement(query)) {
                 Contact resultSet = getContact(firstName, lastName, statement);
                 if (resultSet != null) return resultSet;
@@ -107,6 +117,7 @@ public class PostgreSQLContactDAO implements ContactDAO {
         return null;
     }
 
+    // Methode zum Abrufen eines Kontakts
     private Contact getContact(String firstName, String lastName, PreparedStatement statement) throws SQLException {
         statement.setString(1, firstName);
         statement.setString(2, lastName);
@@ -126,6 +137,7 @@ public class PostgreSQLContactDAO implements ContactDAO {
         return null;
     }
 
+    // Implementierung der getAllContacts-Methode aus dem ContactDAO-Interface
     @Override
     public Contact[] getAllContacts() throws SQLException {
         List<Contact> contactList = new ArrayList<>();
@@ -133,7 +145,7 @@ public class PostgreSQLContactDAO implements ContactDAO {
         try (PreparedStatement statement = connection1.prepareStatement(query)) {
             getAllContacts(contactList, statement);
         } catch (SQLException e) {
-            // If an error occurs with the first database, try with the second one
+            // Wenn ein Fehler mit der ersten Datenbank auftritt, versuchen Sie es mit der zweiten
             try (PreparedStatement statement = connection2.prepareStatement(query)) {
                 getAllContacts(contactList, statement);
             }
@@ -141,6 +153,7 @@ public class PostgreSQLContactDAO implements ContactDAO {
         return contactList.toArray(new Contact[0]);
     }
 
+    // Methode zum Abrufen aller Kontakte
     private void getAllContacts(List<Contact> contactList, PreparedStatement statement) throws SQLException {
         try (ResultSet resultSet = statement.executeQuery()) {
             while (resultSet.next()) {

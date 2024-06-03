@@ -23,6 +23,7 @@ public class ContactGUI extends JFrame {
     private JTextField filterTextField;
     private JComboBox<String> filterComboBox;
 
+    // Konstruktor für die Kontaktverwaltung GUI
     public ContactGUI(ContactController contactController) {
         this.contactController = contactController;
 
@@ -30,18 +31,19 @@ public class ContactGUI extends JFrame {
         setSize(600, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        // Create table to display contacts
+        // Erstellen Sie eine Tabelle zur Anzeige von Kontakten
         createTable();
 
-        // Add buttons for adding, editing, and deleting contacts
+        // Fügen Sie Schaltflächen zum Hinzufügen, Bearbeiten und Löschen von Kontakten hinzu
         addButtons();
 
-        // Add filter components
+        // Fügen Sie Filterkomponenten hinzu
         addFilterComponents();
 
         setVisible(true);
     }
 
+    // Methode zum Hinzufügen von Filterkomponenten
     private void addFilterComponents() {
         JPanel filterPanel = new JPanel();
         filterTextField = new JTextField(20);
@@ -49,38 +51,39 @@ public class ContactGUI extends JFrame {
         JButton filterButton = new JButton("Filtern");
         JButton showAllButton = new JButton("Alle anzeigen"); // Neuer Button
 
+        // ActionListener für den Filter-Button
         filterButton.addActionListener(_ -> {
             String filterField = (String) filterComboBox.getSelectedItem();
             String filterValue = filterTextField.getText();
 
             try {
                 List<Contact> filteredContacts = contactController.getFilteredContacts(filterField, filterValue);
-                tableModel.setRowCount(0); // Clear existing table data
+                tableModel.setRowCount(0); // Löschen Sie vorhandene Tabellendaten
                 for (Contact contact : filteredContacts) {
                     addContactToTable(contact);
                 }
             } catch (SQLException e) {
-                LOGGER.log(Level.SEVERE, "Error filtering contacts.", e);
-                JOptionPane.showMessageDialog(this, "Error filtering contacts.");
+                LOGGER.log(Level.SEVERE, "Fehler beim Filtern von Kontakten.", e);
+                JOptionPane.showMessageDialog(this, "Fehler beim Filtern von Kontakten.");
             }
         });
 
-        // Fügt einen ActionListener zum "Alle anzeigen" Button hinzu
+        // ActionListener für den "Alle anzeigen" Button
         showAllButton.addActionListener(_ -> loadContacts());
 
         filterPanel.add(filterComboBox);
         filterPanel.add(filterTextField);
         filterPanel.add(filterButton);
-        filterPanel.add(showAllButton); // Fügt den "Alle anzeigen" Button zum Panel hinzu
+        filterPanel.add(showAllButton); // Fügen Sie den "Alle anzeigen" Button zum Panel hinzu
         add(filterPanel, BorderLayout.NORTH);
     }
 
+    // Methode zum Erstellen der Tabelle
     private void createTable() {
         tableModel = new DefaultTableModel() {
             @Override
             public boolean isCellEditable(int row, int column) {
-                // This causes all cells to be not editable
-                return false;
+                return false; // Alle Zellen sind nicht editierbar
             }
         };
         tableModel.addColumn("Vornamen");
@@ -93,15 +96,15 @@ public class ContactGUI extends JFrame {
         contactTable = new JTable(tableModel);
         contactTable.setAutoCreateRowSorter(true);
 
-        // Set the background color of the table
+        // Setzen Sie die Hintergrundfarbe der Tabelle
         contactTable.setBackground(Color.BLUE);
 
-        // Set the background color of the cells
+        // Setzen Sie die Hintergrundfarbe der Zellen
         contactTable.setDefaultRenderer(Object.class, new DefaultTableCellRenderer(){
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                c.setBackground(Color.LIGHT_GRAY);
+                c.setBackground(row % 2 == 0 ? Color.LIGHT_GRAY : Color.WHITE);
                 return c;
             }
         });
@@ -109,40 +112,37 @@ public class ContactGUI extends JFrame {
         JScrollPane scrollPane = new JScrollPane(contactTable);
         scrollPane.getViewport().setBackground(Color.darkGray);
 
-        // Create a JPanel as a container
+        // Erstellen Sie ein JPanel als Container
         JPanel tableContainer = new JPanel(new BorderLayout());
 
-        // Add some padding to the container
+        // Fügen Sie etwas Padding zum Container hinzu
         tableContainer.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        // Add the scrollPane to the container
+        // Fügen Sie die scrollPane zum Container hinzu
         tableContainer.add(scrollPane, BorderLayout.CENTER);
 
-        // Add the container to the frame instead of the scrollPane
+        // Fügen Sie den Container anstelle der scrollPane zum Frame hinzu
         add(tableContainer, BorderLayout.CENTER);
 
-        // Load existing contacts into the table
+        // Laden Sie vorhandene Kontakte in die Tabelle
         loadContacts();
     }
 
+    // Methode zum Laden von Kontakten
     private void loadContacts() {
         try {
-            // Retrieve contacts from the database using your ContactController
             Contact[] contacts = contactController.getAllContacts();
-
-            // Clear existing table data
-            tableModel.setRowCount(0);
-
-            // Add each contact to the table
+            tableModel.setRowCount(0); // Löschen Sie vorhandene Tabellendaten
             for (Contact contact : contacts) {
                 addContactToTable(contact);
             }
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error loading contacts from database.", e);
-            JOptionPane.showMessageDialog(this, "Error loading contacts from database.");
+            LOGGER.log(Level.SEVERE, "Fehler beim Laden von Kontakten.", e);
+            JOptionPane.showMessageDialog(this, "Fehler beim Laden von Kontakten.");
         }
     }
 
+    // Methode zum Hinzufügen eines Kontakts zur Tabelle
     private void addContactToTable(Contact contact) {
         Vector<String> row = new Vector<>();
         row.add(contact.getFirstName());
@@ -154,6 +154,7 @@ public class ContactGUI extends JFrame {
         tableModel.addRow(row);
     }
 
+    // Methode zum Hinzufügen von Schaltflächen
     private void addButtons() {
         JPanel buttonPanel = new JPanel();
         JButton addButton = new JButton("Kontakt hinzufügen");
@@ -162,7 +163,7 @@ public class ContactGUI extends JFrame {
 
         addButton.addActionListener(_ -> {
             new AddContactDialog(ContactGUI.this, contactController);
-            loadContacts(); // Reload contacts after adding
+            loadContacts(); // Kontakte neu laden nach dem Hinzufügen
         });
 
         editButton.addActionListener(_ -> {
@@ -172,16 +173,12 @@ public class ContactGUI extends JFrame {
                 String firstName = (String) tableModel.getValueAt(selectedRow, 0);
                 String lastName = (String) tableModel.getValueAt(selectedRow, 1);
                 try {
-                    Contact selectedContact = contactController.getContact(firstName, lastName);
-                    if (selectedContact != null) {
-                        new EditContactDialog(ContactGUI.this, contactController, selectedContact);
-                        loadContacts(); // Reload contacts after editing
-                    } else {
-                        JOptionPane.showMessageDialog(ContactGUI.this, "Error: Selected contact not found.");
-                    }
+                    Contact contact = contactController.getContact(firstName, lastName);
+                    new EditContactDialog(ContactGUI.this, contactController, contact);
+                    loadContacts(); // Kontakte neu laden nach dem Bearbeiten
                 } catch (SQLException ex) {
-                    LOGGER.log(Level.SEVERE, "Error retrieving contact.", ex);
-                    JOptionPane.showMessageDialog(ContactGUI.this, "Error retrieving contact.");
+                    LOGGER.log(Level.SEVERE, "Fehler beim Abrufen des Kontakts.", ex);
+                    JOptionPane.showMessageDialog(ContactGUI.this, "Fehler beim Abrufen des Kontakts.");
                 }
             }
         });
@@ -193,26 +190,12 @@ public class ContactGUI extends JFrame {
                 String firstName = (String) tableModel.getValueAt(selectedRow, 0);
                 String lastName = (String) tableModel.getValueAt(selectedRow, 1);
                 try {
-                    Contact selectedContact = contactController.getContact(firstName, lastName);
-                    if (selectedContact != null) {
-                        // Show confirmation dialog before deleting
-                        int response = JOptionPane.showConfirmDialog(
-                                ContactGUI.this,
-                                String.format("Möchten Sie %s %s wirklich löschen?", firstName, lastName),
-                                "Bestätigen",
-                                JOptionPane.YES_NO_OPTION,
-                                JOptionPane.QUESTION_MESSAGE
-                        );
-                        if (response == JOptionPane.YES_OPTION) {
-                            contactController.deleteContact(selectedContact);
-                            tableModel.removeRow(selectedRow);
-                        }
-                    } else {
-                        JOptionPane.showMessageDialog(ContactGUI.this, "Error: Selected contact not found.");
-                    }
+                    Contact contact = contactController.getContact(firstName, lastName);
+                    contactController.deleteContact(contact);
+                    loadContacts(); // Kontakte neu laden nach dem Löschen
                 } catch (SQLException ex) {
-                    LOGGER.log(Level.SEVERE, "Error deleting contact.", ex);
-                    JOptionPane.showMessageDialog(ContactGUI.this, "Error deleting contact.");
+                    LOGGER.log(Level.SEVERE, "Fehler beim Löschen des Kontakts.", ex);
+                    JOptionPane.showMessageDialog(ContactGUI.this, "Fehler beim Löschen des Kontakts.");
                 }
             }
         });

@@ -18,10 +18,11 @@ public class AddContactDialog extends JDialog {
     private final JTextField postalCodeField;
     private final JTextField phoneNumberField;
 
+    // Konstruktor für den Dialog zum Hinzufügen von Kontakten
     public AddContactDialog(JFrame parent, ContactController contactController) {
         super(parent, "Kontakt hinzufügen", true);
 
-        // Create and configure input fields
+        // Erstellen und Konfigurieren der Eingabefelder
         firstNameField = new JTextField(TEXT_FIELD_SIZE);
         lastNameField = new JTextField(TEXT_FIELD_SIZE);
         streetField = new JTextField(TEXT_FIELD_SIZE);
@@ -29,7 +30,7 @@ public class AddContactDialog extends JDialog {
         postalCodeField = new JTextField(TEXT_FIELD_SIZE);
         phoneNumberField = new JTextField(TEXT_FIELD_SIZE);
 
-        // Create and configure labels for input fields
+        // Erstellen und Konfigurieren der Labels für die Eingabefelder
         JLabel firstNameLabel = new JLabel("Vorname:");
         JLabel lastNameLabel = new JLabel("Nachname:");
         JLabel streetLabel = new JLabel("Straße:");
@@ -37,13 +38,13 @@ public class AddContactDialog extends JDialog {
         JLabel postalCodeLabel = new JLabel("Postleitzahl:");
         JLabel phoneNumberLabel = new JLabel("Telefonnummer:");
 
-        // Create OK and Cancel buttons
+        // Erstellen der OK- und Abbrechen-Buttons
         JButton okButton = new JButton("OK");
         JButton cancelButton = new JButton("Cancel");
 
-        // Add action listeners to buttons
+        // Hinzufügen von ActionListeners zu den Buttons
         okButton.addActionListener(_ -> {
-            // Get input values
+            // Eingabewerte abrufen
             String firstName = firstNameField.getText();
             String lastName = lastNameField.getText();
             String street = streetField.getText();
@@ -51,18 +52,18 @@ public class AddContactDialog extends JDialog {
             String postalCode = postalCodeField.getText();
             String phoneNumber = phoneNumberField.getText();
 
-            // Validate input
+            // Eingabe validieren
             if (ValidationUtils.validateInputFields(firstName, lastName, phoneNumber, postalCode, this)) {
                 return;
             }
 
-            // Create new contact
+            // Neuen Kontakt erstellen
             Contact newContact = new Contact(firstName, lastName, street, city, postalCode, phoneNumber);
 
-            // Add contact to database
+            // Kontakt zur Datenbank hinzufügen
             try {
                 contactController.addContact(newContact);
-                dispose(); // Close dialog after adding contact
+                dispose(); // Dialog schließen nach dem Hinzufügen des Kontakts
             } catch (SQLException ex) {
                 String errorMessage = String.format("Error adding contact: %s", ex.getMessage());
                 JOptionPane.showMessageDialog(AddContactDialog.this, errorMessage);
@@ -70,10 +71,10 @@ public class AddContactDialog extends JDialog {
         });
 
         cancelButton.addActionListener(_ -> {
-            dispose(); // Close dialog without adding contact
+            dispose(); // Dialog schließen ohne Hinzufügen des Kontakts
         });
 
-        // Create panel to hold input fields and labels
+        // Panel erstellen, um Eingabefelder und Labels zu halten
         JPanel inputPanel = new JPanel(new GridLayout(6, 2));
         inputPanel.add(firstNameLabel);
         inputPanel.add(firstNameField);
@@ -88,16 +89,16 @@ public class AddContactDialog extends JDialog {
         inputPanel.add(phoneNumberLabel);
         inputPanel.add(phoneNumberField);
 
-        // Create panel to hold buttons
+        // Panel erstellen, um die Buttons zu halten
         JPanel buttonPanel = new JPanel();
         buttonPanel.add(okButton);
         buttonPanel.add(cancelButton);
 
-        // Add input panel and button panel to dialog
+        // Eingabe-Panel und Button-Panel zum Dialog hinzufügen
         add(inputPanel, BorderLayout.CENTER);
         add(buttonPanel, BorderLayout.SOUTH);
 
-        // Set dialog properties
+        // Dialogeigenschaften setzen
         pack();
         setLocationRelativeTo(parent);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);

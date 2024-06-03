@@ -18,10 +18,11 @@ public class EditContactDialog extends JDialog {
     private final JTextField postalCodeField;
     private final JTextField phoneNumberField;
 
+    // Konstruktor für den Dialog zum Bearbeiten von Kontakten
     public EditContactDialog(JFrame parent, ContactController contactController, Contact contact) {
         super(parent, "Kontakt bearbeiten", true);
 
-        // Create and configure input fields
+        // Erstellen und Konfigurieren der Eingabefelder
         firstNameField = new JTextField(TEXT_FIELD_SIZE);
         lastNameField = new JTextField(TEXT_FIELD_SIZE);
         streetField = new JTextField(TEXT_FIELD_SIZE);
@@ -29,7 +30,7 @@ public class EditContactDialog extends JDialog {
         postalCodeField = new JTextField(TEXT_FIELD_SIZE);
         phoneNumberField = new JTextField(TEXT_FIELD_SIZE);
 
-        // Load contact data into fields
+        // Laden Sie die Kontaktdaten in die Felder
         firstNameField.setText(contact.getFirstName());
         lastNameField.setText(contact.getLastName());
         streetField.setText(contact.getStreet());
@@ -37,7 +38,7 @@ public class EditContactDialog extends JDialog {
         postalCodeField.setText(contact.getPostalCode());
         phoneNumberField.setText(contact.getPhoneNumber());
 
-        // Create and configure labels for input fields
+        // Erstellen und Konfigurieren der Labels für die Eingabefelder
         JLabel firstNameLabel = new JLabel("Vorname:");
         JLabel lastNameLabel = new JLabel("Nachname:");
         JLabel streetLabel = new JLabel("Straße:");
@@ -45,13 +46,13 @@ public class EditContactDialog extends JDialog {
         JLabel postalCodeLabel = new JLabel("Postleitzahl:");
         JLabel phoneNumberLabel = new JLabel("Telefonnummer:");
 
-        // Create OK and Cancel buttons
+        // Erstellen der OK- und Abbrechen-Buttons
         JButton okButton = new JButton("OK");
-        JButton cancelButton = new JButton("Abbrechen");
+        JButton cancelButton = new JButton("Cancel");
 
-        // Add action listeners to buttons
+        // Hinzufügen von ActionListeners zu den Buttons
         okButton.addActionListener(_ -> {
-            // Get input values
+            // Eingabewerte abrufen
             String firstName = firstNameField.getText();
             String lastName = lastNameField.getText();
             String street = streetField.getText();
@@ -59,12 +60,12 @@ public class EditContactDialog extends JDialog {
             String postalCode = postalCodeField.getText();
             String phoneNumber = phoneNumberField.getText();
 
-            // Validate input
+            // Eingabe validieren
             if (ValidationUtils.validateInputFields(firstName, lastName, phoneNumber, postalCode, this)) {
                 return;
             }
 
-            // Update contact
+            // Aktualisieren Sie die Kontaktdaten
             contact.setFirstName(firstName);
             contact.setLastName(lastName);
             contact.setStreet(street);
@@ -72,20 +73,21 @@ public class EditContactDialog extends JDialog {
             contact.setPostalCode(postalCode);
             contact.setPhoneNumber(phoneNumber);
 
-            // Update contact in database
+            // Kontakt in der Datenbank aktualisieren
             try {
-                contactController.updateContact(contact); // Use the updated contact with the id
-                dispose(); // Close dialog after updating contact
+                contactController.updateContact(contact);
+                dispose(); // Dialog schließen nach dem Aktualisieren des Kontakts
             } catch (SQLException ex) {
-                JOptionPane.showMessageDialog(EditContactDialog.this, String.format("Fehler beim Aktualisieren des Kontakts: %s", ex.getMessage()));
+                String errorMessage = String.format("Fehler beim Aktualisieren des Kontakts: %s", ex.getMessage());
+                JOptionPane.showMessageDialog(EditContactDialog.this, errorMessage);
             }
         });
 
         cancelButton.addActionListener(_ -> {
-            dispose(); // Close dialog without updating contact
+            dispose(); // Dialog schließen ohne Aktualisieren des Kontakts
         });
 
-        // Create panel to hold input fields and labels
+        // Panel erstellen, um Eingabefelder und Labels zu halten
         JPanel inputPanel = new JPanel(new GridLayout(6, 2));
         inputPanel.add(firstNameLabel);
         inputPanel.add(firstNameField);
@@ -100,16 +102,16 @@ public class EditContactDialog extends JDialog {
         inputPanel.add(phoneNumberLabel);
         inputPanel.add(phoneNumberField);
 
-        // Create panel to hold buttons
+        // Panel erstellen, um die Buttons zu halten
         JPanel buttonPanel = new JPanel();
         buttonPanel.add(okButton);
         buttonPanel.add(cancelButton);
 
-        // Add input panel and button panel to dialog
+        // Eingabe-Panel und Button-Panel zum Dialog hinzufügen
         add(inputPanel, BorderLayout.CENTER);
         add(buttonPanel, BorderLayout.SOUTH);
 
-        // Set dialog properties
+        // Dialogeigenschaften setzen
         pack();
         setLocationRelativeTo(parent);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
